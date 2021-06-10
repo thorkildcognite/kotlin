@@ -34544,6 +34544,12 @@ public class FirOldFrontendDiagnosticsTestGenerated extends AbstractFirDiagnosti
             }
 
             @Test
+            @TestMetadata("useExperimentalOnStatement.kt")
+            public void testUseExperimentalOnStatement() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/experimental/useExperimentalOnStatement.kt");
+            }
+
+            @Test
             @TestMetadata("useExperimentalOnWholeModule.kt")
             public void testUseExperimentalOnWholeModule() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/experimental/useExperimentalOnWholeModule.kt");
