@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.fir.analysis.checkers.expression
 
 import org.jetbrains.kotlin.config.AnalysisFlags
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.fir.*
 import org.jetbrains.kotlin.fir.analysis.checkers.*
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
@@ -66,7 +67,8 @@ internal object FirOptInUsageBaseChecker {
 
     internal fun FirAnnotatedDeclaration.loadExperimentalities(
         context: CheckerContext,
-        visited: MutableSet<FirAnnotatedDeclaration> = mutableSetOf()
+        visited: MutableSet<FirAnnotatedDeclaration> = mutableSetOf(),
+        fromSetter: Boolean = false,
     ): Set<Experimentality> {
         if (!visited.add(this)) return emptySet()
         val result = SmartSet.create<Experimentality>()
@@ -82,7 +84,7 @@ internal object FirOptInUsageBaseChecker {
                     }
                 } else if (this is FirProperty) {
                     parentClassScope?.processDirectlyOverriddenProperties(symbol) {
-                        result.addAll(it.fir.loadExperimentalities(context, visited))
+                        result.addAll(it.fir.loadExperimentalities(context, visited, fromSetter))
                         ProcessorAction.NEXT
                     }
                 }
@@ -100,6 +102,9 @@ internal object FirOptInUsageBaseChecker {
             if (parentClass != null) {
                 result.addAll(parentClass.loadExperimentalities(context, visited))
             }
+            if (fromSetter && this is FirProperty) {
+                result.addAll(setter?.loadExperimentalities(context, visited).orEmpty())
+            }
         } else if (this is FirRegularClass && !this.isLocal) {
             val parentClass = this.outerClass(context)
             if (parentClass != null) {
@@ -109,11 +114,13 @@ internal object FirOptInUsageBaseChecker {
 
         for (annotation in annotations) {
             val annotationType = annotation.annotationTypeRef.coneTypeSafe<ConeClassLikeType>()
-            result.addIfNotNull(
-                annotationType?.fullyExpandedType(session)?.lookupTag?.toFirRegularClass(
-                    session
-                )?.loadExperimentalityForMarkerAnnotation()
-            )
+            if (annotation.useSiteTarget != AnnotationUseSiteTarget.PROPERTY_SETTER || fromSetter) {
+                result.addIfNotNull(
+                    annotationType?.fullyExpandedType(session)?.lookupTag?.toFirRegularClass(
+                        session
+                    )?.loadExperimentalityForMarkerAnnotation()
+                )
+            }
         }
 
         if (this is FirTypeAlias) {
