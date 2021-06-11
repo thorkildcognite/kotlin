@@ -26,7 +26,7 @@ object FirOptInUsageTypeRefChecker : FirTypeRefChecker() {
         val fqName = symbol.classId.asSingleFqName()
         val lastAnnotationCall = context.qualifiedAccessOrAnnotationCalls.lastOrNull() as? FirAnnotationCall
         if ((lastAnnotationCall == null || lastAnnotationCall.annotationTypeRef !== typeRef) &&
-            (fqName in OptInNames.EXPERIMENTAL_FQ_NAMES || fqName in OptInNames.USE_EXPERIMENTAL_FQ_NAMES)
+            (fqName == OptInNames.REQUIRES_OPT_IN_FQ_NAME || fqName == OptInNames.OPT_IN_FQ_NAME)
         ) {
             reporter.reportOn(typeRef.source, FirErrors.EXPERIMENTAL_CAN_ONLY_BE_USED_AS_ANNOTATION, context)
         }
