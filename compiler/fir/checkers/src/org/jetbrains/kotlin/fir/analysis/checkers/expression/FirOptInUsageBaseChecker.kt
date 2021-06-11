@@ -65,12 +65,20 @@ internal object FirOptInUsageBaseChecker {
         }
     }
 
+    private object DeclarationExperimentalities : FirDeclarationDataKey()
+
+    private var FirAnnotatedDeclaration.experimentalities: Set<Experimentality>?
+            by FirDeclarationDataRegistry.data(DeclarationExperimentalities)
+
     internal fun FirAnnotatedDeclaration.loadExperimentalities(
         context: CheckerContext,
         visited: MutableSet<FirAnnotatedDeclaration> = mutableSetOf(),
         fromSetter: Boolean = false,
     ): Set<Experimentality> {
         if (!visited.add(this)) return emptySet()
+        if (!fromSetter) {
+            experimentalities?.let { return it }
+        }
         val result = SmartSet.create<Experimentality>()
         val session = context.session
         if (this is FirCallableMemberDeclaration) {
@@ -137,6 +145,9 @@ internal object FirOptInUsageBaseChecker {
 
         // TODO: getAnnotationsOnContainingModule
 
+        if (!fromSetter) {
+            experimentalities = result
+        }
         return result
     }
 
