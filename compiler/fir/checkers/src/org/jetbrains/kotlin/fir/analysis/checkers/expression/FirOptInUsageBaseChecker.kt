@@ -155,7 +155,6 @@ object FirOptInUsageBaseChecker {
 
     internal fun FirRegularClass.loadExperimentalityForMarkerAnnotation(): Experimentality? {
         val experimental = getAnnotationByFqName(OptInNames.REQUIRES_OPT_IN_FQ_NAME)
-            ?: getAnnotationByFqName(OptInNames.OLD_EXPERIMENTAL_FQ_NAME)
             ?: return null
 
         val levelArgument = experimental.findArgumentByName(LEVEL) as? FirQualifiedAccessExpression
@@ -220,7 +219,7 @@ object FirOptInUsageBaseChecker {
     private fun FirAnnotationContainer.isAnnotatedWithUseExperimentalOf(annotationFqName: FqName): Boolean {
         for (annotation in annotations) {
             val coneType = annotation.annotationTypeRef.coneType as? ConeClassLikeType
-            if (coneType?.lookupTag?.classId?.asSingleFqName() !in OptInNames.USE_EXPERIMENTAL_FQ_NAMES) {
+            if (coneType?.lookupTag?.classId?.asSingleFqName() != OptInNames.OPT_IN_FQ_NAME) {
                 continue
             }
             val annotationClasses = annotation.findArgumentByName(OptInNames.USE_EXPERIMENTAL_ANNOTATION_CLASS) ?: continue
