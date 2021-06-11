@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.analysis.checkers.type
 
+import org.jetbrains.kotlin.fir.FirRealSourceElementKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirOptInUsageBaseChecker
 import org.jetbrains.kotlin.fir.analysis.diagnostics.DiagnosticReporter
@@ -19,6 +20,7 @@ import org.jetbrains.kotlin.resolve.checkers.OptInNames
 
 object FirOptInUsageTypeRefChecker : FirTypeRefChecker() {
     override fun check(typeRef: FirTypeRef, context: CheckerContext, reporter: DiagnosticReporter) {
+        if (typeRef.source?.kind !is FirRealSourceElementKind) return
         val coneType = typeRef.coneTypeSafe<ConeClassLikeType>() ?: return
         val symbol = coneType.lookupTag.toSymbol(context.session) ?: return
         val fqName = symbol.classId.asSingleFqName()
