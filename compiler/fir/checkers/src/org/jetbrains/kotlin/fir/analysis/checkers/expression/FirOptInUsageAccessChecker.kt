@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.analysis.checkers.expression
 
+import org.jetbrains.kotlin.fir.FirFakeSourceElementKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.expressions.FirQualifiedAccess
@@ -12,6 +13,10 @@ import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
 
 object FirOptInUsageAccessChecker : FirQualifiedAccessChecker() {
     override fun check(expression: FirQualifiedAccess, context: CheckerContext, reporter: DiagnosticReporter) {
+        val sourceKind = expression.source?.kind
+        if (sourceKind is FirFakeSourceElementKind.DataClassGeneratedMembers ||
+            sourceKind is FirFakeSourceElementKind.PropertyFromParameter
+        ) return
         val reference = expression.calleeReference as? FirResolvedNamedReference ?: return
         val fir = reference.resolvedSymbol
         with(FirOptInUsageBaseChecker) {

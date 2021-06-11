@@ -21,7 +21,7 @@ abstract class User {
     }
 }
 
-data class DataClass(<!EXPERIMENTAL_API_USAGE_ERROR!>@property:Marker val x: Int<!>)
+data class DataClass(@property:Marker val x: Int)
 
 fun useDataClass(d: DataClass) {
     // Should have error in both
