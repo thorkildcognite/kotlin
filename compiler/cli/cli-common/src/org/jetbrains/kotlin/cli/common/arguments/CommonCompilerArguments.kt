@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.cli.common.arguments
 
 import com.intellij.util.xmlb.annotations.Transient
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.INFO
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.WARNING
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.*
@@ -395,7 +396,7 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
             val optInDeprecatedFqNames = optInDeprecated?.toList().orEmpty()
             if (optInDeprecatedFqNames.isNotEmpty()) {
                 collector.report(
-                    WARNING, "'-Xopt-in' is deprecated and will be removed in a future release, please use -opt-in instead"
+                    INFO, "'-Xopt-in' is deprecated and will be removed in a future release, please use -opt-in instead"
                 )
             }
             put(AnalysisFlags.useExperimental, useExperimentalFqNames + optInDeprecatedFqNames + optIn?.toList().orEmpty())
