@@ -72,8 +72,8 @@ package usage3
 import api.*
 
 fun use() {
-    function()
-    property
+    <!EXPERIMENTAL_API_USAGE!>function<!>()
+    <!EXPERIMENTAL_API_USAGE!>property<!>
     val s: Typealias = ""
-    s.hashCode()
+    <!EXPERIMENTAL_API_USAGE!>s<!>.hashCode()
 }

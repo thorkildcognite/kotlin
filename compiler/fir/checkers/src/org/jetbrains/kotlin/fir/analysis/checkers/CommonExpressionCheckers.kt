@@ -22,6 +22,11 @@ object CommonExpressionCheckers : ExpressionCheckers() {
             FirExpressionAnnotationChecker,
         )
 
+    override val qualifiedAccessCheckers: Set<FirQualifiedAccessChecker>
+        get() = setOf(
+            FirOptInUsageAccessChecker,
+        )
+
     override val qualifiedAccessExpressionCheckers: Set<FirQualifiedAccessExpressionChecker>
         get() = setOf(
             FirCallableReferenceChecker,
@@ -112,6 +117,7 @@ object CommonExpressionCheckers : ExpressionCheckers() {
     override val resolvedQualifierCheckers: Set<FirResolvedQualifierChecker>
         get() = setOf(
             FirStandaloneQualifierChecker,
+            FirOptInUsageQualifierChecker,
         )
 
     override val equalityOperatorCallCheckers: Set<FirEqualityOperatorCallChecker>
