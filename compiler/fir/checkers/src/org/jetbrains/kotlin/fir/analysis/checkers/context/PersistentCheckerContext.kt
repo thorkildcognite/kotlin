@@ -25,13 +25,13 @@ class PersistentCheckerContext private constructor(
     override val qualifiedAccessOrAnnotationCalls: PersistentList<FirStatement>,
     override val getClassCalls: PersistentList<FirGetClassCall>,
     override val annotationContainers: PersistentList<FirAnnotationContainer>,
-    override val sessionHolder: SessionHolder,
-    override val returnTypeCalculator: ReturnTypeCalculator,
+    sessionHolder: SessionHolder,
+    returnTypeCalculator: ReturnTypeCalculator,
     override val suppressedDiagnostics: PersistentSet<String>,
-    override val allInfosSuppressed: Boolean,
-    override val allWarningsSuppressed: Boolean,
-    override val allErrorsSuppressed: Boolean
-) : CheckerContext() {
+    allInfosSuppressed: Boolean,
+    allWarningsSuppressed: Boolean,
+    allErrorsSuppressed: Boolean
+) : AbstractCheckerContext(sessionHolder, returnTypeCalculator, allInfosSuppressed, allWarningsSuppressed, allErrorsSuppressed) {
     constructor(sessionHolder: SessionHolder, returnTypeCalculator: ReturnTypeCalculator) : this(
         PersistentImplicitReceiverStack(),
         persistentListOf(),
