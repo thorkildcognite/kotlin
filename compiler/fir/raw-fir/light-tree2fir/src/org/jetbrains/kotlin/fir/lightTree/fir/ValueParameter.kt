@@ -50,16 +50,18 @@ class ValueParameter(
         return buildProperty {
             val parameterSource = firValueParameter.source as? FirLightSourceElement
             val parameterNode = parameterSource?.lighterASTNode
-            source = parameterNode?.toFirLightSourceElement(
+            val propertySource = parameterNode?.toFirLightSourceElement(
                 parameterSource.treeStructure, FirFakeSourceElementKind.PropertyFromParameter
             )
+            source = propertySource
             this.moduleData = moduleData
             origin = FirDeclarationOrigin.Source
             returnTypeRef = type.copyWithNewSourceKind(FirFakeSourceElementKind.PropertyFromParameter)
             this.name = name
             initializer = buildQualifiedAccessExpression {
-                source = firValueParameter.source
+                source = propertySource
                 calleeReference = buildPropertyFromParameterResolvedNamedReference {
+                    source = propertySource
                     this.name = name
                     resolvedSymbol = this@ValueParameter.firValueParameter.symbol
                 }

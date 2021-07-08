@@ -16,7 +16,10 @@ import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
 
 object FirOptInUsageAccessChecker : FirQualifiedAccessChecker() {
     override fun check(expression: FirQualifiedAccess, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (expression.source?.kind is FirFakeSourceElementKind.DataClassGeneratedMembers) return
+        val sourceKind = expression.source?.kind
+        if (sourceKind is FirFakeSourceElementKind.DataClassGeneratedMembers ||
+            sourceKind is FirFakeSourceElementKind.PropertyFromParameter
+        ) return
         val reference = expression.calleeReference as? FirResolvedNamedReference ?: return
         val fir = reference.resolvedSymbol.fir as? FirAnnotatedDeclaration ?: return
         with(FirOptInUsageBaseChecker) {

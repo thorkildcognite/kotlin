@@ -124,7 +124,7 @@ fun returnType(): <!WRONG_ANNOTATION_TARGET!>@EAnno<!> Unit {}
 
 @EAnno class Klass
 
-annotation class AnnotationArgument(<!EXPERIMENTAL_API_USAGE!>val p: EAnno<!>)
+annotation class AnnotationArgument(val p: EAnno)
 
 fun insideBody() {
     @EAnno fun local() {}
