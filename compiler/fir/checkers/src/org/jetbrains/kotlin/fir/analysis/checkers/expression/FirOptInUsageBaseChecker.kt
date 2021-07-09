@@ -123,7 +123,7 @@ object FirOptInUsageBaseChecker {
             result.addAll(expandedTypeRef.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context, visited))
         }
 
-        if (getAnnotationByFqName(OptInNames.WAS_EXPERIMENTAL_FQ_NAME) != null) {
+        if (getAnnotationByClassId(OptInNames.WAS_EXPERIMENTAL_CLASS_ID) != null) {
             val accessibility = checkSinceKotlinVersionAccessibility(context)
             if (accessibility is FirSinceKotlinAccessibility.NotAccessibleButWasExperimental) {
                 result.addAll(accessibility.markerClasses.mapNotNull { it.fir.loadExperimentalityForMarkerAnnotation() })
@@ -165,7 +165,7 @@ object FirOptInUsageBaseChecker {
         }
 
     internal fun FirRegularClass.loadExperimentalityForMarkerAnnotation(): Experimentality? {
-        val experimental = getAnnotationByFqName(OptInNames.REQUIRES_OPT_IN_FQ_NAME)
+        val experimental = getAnnotationByClassId(OptInNames.REQUIRES_OPT_IN_CLASS_ID)
             ?: return null
 
         val levelArgument = experimental.findArgumentByName(LEVEL) as? FirQualifiedAccessExpression
@@ -224,7 +224,7 @@ object FirOptInUsageBaseChecker {
     private fun FirAnnotationContainer.isAnnotatedWithUseExperimentalOf(annotationFqName: FqName): Boolean {
         for (annotation in annotations) {
             val coneType = annotation.annotationTypeRef.coneType as? ConeClassLikeType
-            if (coneType?.lookupTag?.classId?.asSingleFqName() != OptInNames.OPT_IN_FQ_NAME) {
+            if (coneType?.lookupTag?.classId != OptInNames.OPT_IN_CLASS_ID) {
                 continue
             }
             val annotationClasses = annotation.findArgumentByName(OptInNames.USE_EXPERIMENTAL_ANNOTATION_CLASS) ?: continue
