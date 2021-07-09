@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.resolve.checkers.OptInNames
 object FirOptInAnnotationClassChecker : FirRegularClassChecker() {
     override fun check(declaration: FirRegularClass, context: CheckerContext, reporter: DiagnosticReporter) {
         if (declaration.classKind != ClassKind.ANNOTATION_CLASS) return
-        if (declaration.getAnnotationByFqName(OptInNames.REQUIRES_OPT_IN_FQ_NAME) == null) return
+        if (declaration.getAnnotationByClassId(OptInNames.REQUIRES_OPT_IN_CLASS_ID) == null) return
         if (declaration.getRetention() == AnnotationRetention.SOURCE) {
             val target = declaration.getRetentionAnnotation()
             reporter.reportOn(target?.source, FirErrors.EXPERIMENTAL_ANNOTATION_WITH_WRONG_RETENTION, context)
