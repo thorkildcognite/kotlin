@@ -117,7 +117,7 @@ object FirOptInUsageBaseChecker {
             val annotationType = annotation.annotationTypeRef.coneTypeSafe<ConeClassLikeType>()
             if (annotation.useSiteTarget != AnnotationUseSiteTarget.PROPERTY_SETTER || fromSetter) {
                 result.addIfNotNull(
-                    annotationType?.fullyExpandedType(session)?.lookupTag?.toFirRegularClass(
+                    annotationType?.lookupTag?.toFirRegularClass(
                         session
                     )?.loadExperimentalityForMarkerAnnotation()
                 )
