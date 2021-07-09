@@ -92,13 +92,13 @@ object FirOptInUsageBaseChecker {
             }
             if (this !is FirConstructor) {
                 // Note: coneType here crashes on overridden members
-                result.addAll(returnTypeRef.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context, visited))
-                result.addAll(receiverTypeRef?.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context, visited))
-                if (this is FirSimpleFunction) {
-                    valueParameters.forEach {
-                        result.addAll(it.returnTypeRef.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context, visited))
-                    }
-                }
+//                result.addAll(returnTypeRef.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context, visited))
+//                result.addAll(receiverTypeRef?.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context, visited))
+//                if (this is FirSimpleFunction) {
+//                    valueParameters.forEach {
+//                        result.addAll(it.returnTypeRef.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context, visited))
+//                    }
+//                }
             }
             if (parentClass != null) {
                 result.addAll(parentClass.loadExperimentalities(context, visited))
