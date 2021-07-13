@@ -89,6 +89,7 @@ object FirErrors {
     val ASSIGNMENT_IN_EXPRESSION_CONTEXT by error0<KtBinaryExpression>()
     val BREAK_OR_CONTINUE_OUTSIDE_A_LOOP by error0<PsiElement>()
     val NOT_A_LOOP_LABEL by error0<PsiElement>()
+    val BREAK_OR_CONTINUE_JUMPS_ACROSS_FUNCTION_BOUNDARY by error0<PsiElement>()
     val VARIABLE_EXPECTED by error0<PsiElement>(SourceElementPositioningStrategies.ASSIGNMENT_LHS)
     val DELEGATION_IN_INTERFACE by error0<PsiElement>()
     val DELEGATION_NOT_TO_INTERFACE by error0<PsiElement>()

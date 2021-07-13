@@ -113,6 +113,10 @@ sealed class KtFirDiagnostic<PSI : PsiElement> : KtDiagnosticWithPsi<PSI> {
         override val diagnosticClass get() = NotALoopLabel::class
     }
 
+    abstract class BreakOrContinueJumpsAcrossFunctionBoundary : KtFirDiagnostic<PsiElement>() {
+        override val diagnosticClass get() = BreakOrContinueJumpsAcrossFunctionBoundary::class
+    }
+
     abstract class VariableExpected : KtFirDiagnostic<PsiElement>() {
         override val diagnosticClass get() = VariableExpected::class
     }

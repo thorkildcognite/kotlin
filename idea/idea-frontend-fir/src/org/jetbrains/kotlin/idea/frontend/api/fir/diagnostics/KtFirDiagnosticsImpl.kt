@@ -147,6 +147,13 @@ internal class NotALoopLabelImpl(
     override val firDiagnostic: FirPsiDiagnostic by weakRef(firDiagnostic)
 }
 
+internal class BreakOrContinueJumpsAcrossFunctionBoundaryImpl(
+    firDiagnostic: FirPsiDiagnostic,
+    override val token: ValidityToken,
+) : KtFirDiagnostic.BreakOrContinueJumpsAcrossFunctionBoundary(), KtAbstractFirDiagnostic<PsiElement> {
+    override val firDiagnostic: FirPsiDiagnostic by weakRef(firDiagnostic)
+}
+
 internal class VariableExpectedImpl(
     firDiagnostic: FirPsiDiagnostic,
     override val token: ValidityToken,
