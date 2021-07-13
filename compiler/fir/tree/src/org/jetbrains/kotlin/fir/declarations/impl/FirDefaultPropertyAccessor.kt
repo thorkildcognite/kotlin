@@ -43,6 +43,7 @@ abstract class FirDefaultPropertyAccessor(
         FirDeclarationStatusImpl(visibility, Modality.FINAL)
     else
         FirResolvedDeclarationStatusImpl(visibility, Modality.FINAL, effectiveVisibility),
+    experimentalities = mutableListOf(),
     deprecation = null,
     containerSource = null,
     dispatchReceiverType = null,
