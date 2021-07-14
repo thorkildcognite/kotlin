@@ -734,7 +734,7 @@ open class RawFirBuilder(
         }
 
         override fun visitKtFile(file: KtFile, data: Unit): FirElement {
-            context.packageFqName = file.packageFqName
+            context.packageFqName = file.packageFqNameByTree
             return buildFile {
                 source = file.toFirSourceElement()
                 moduleData = baseModuleData
