@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.fir.declarations.utils.sourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.builder.buildExpressionStub
+import org.jetbrains.kotlin.fir.resolve.calculateOwnExperimentalitiesFromAnnotations
 import org.jetbrains.kotlin.fir.resolve.defaultType
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -193,6 +194,7 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
             }
 
             annotations += c.annotationDeserializer.loadTypeAliasAnnotations(proto, local.nameResolver)
+            experimentalities.addAll(annotations.calculateOwnExperimentalitiesFromAnnotations(c.session, false))
             symbol = FirTypeAliasSymbol(classId)
             expandedTypeRef = proto.underlyingType(c.typeTable).toTypeRef(local)
             resolvePhase = FirResolvePhase.ANALYZED_DEPENDENCIES
@@ -358,6 +360,7 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
             this.containerSource = c.containerSource
             this.initializer = c.constDeserializer.loadConstant(proto, symbol.callableId, c.nameResolver)
             deprecation = annotations.getDeprecationInfosFromAnnotations(c.session.languageVersionSettings.apiVersion, false)
+            experimentalities.addAll(annotations.calculateOwnExperimentalitiesFromAnnotations(c.session, false))
         }.apply {
             versionRequirementsTable = c.versionRequirementTable
         }
@@ -420,6 +423,7 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
             annotations +=
                 c.annotationDeserializer.loadFunctionAnnotations(c.containerSource, proto, local.nameResolver, local.typeTable)
             deprecation = annotations.getDeprecationInfosFromAnnotations(c.session.languageVersionSettings.apiVersion, false)
+            experimentalities.addAll(annotations.calculateOwnExperimentalitiesFromAnnotations(c.session, false))
             this.containerSource = c.containerSource
         }.apply {
             versionRequirementsTable = c.versionRequirementTable
@@ -491,6 +495,7 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
                 c.annotationDeserializer.loadConstructorAnnotations(c.containerSource, proto, local.nameResolver, local.typeTable)
             containerSource = c.containerSource
             deprecation = annotations.getDeprecationInfosFromAnnotations(c.session.languageVersionSettings.apiVersion, false)
+            experimentalities.addAll(annotations.calculateOwnExperimentalitiesFromAnnotations(c.session, false))
         }.build().apply {
             containingClassAttr = c.dispatchReceiver!!.lookupTag
             versionRequirementsTable = c.versionRequirementTable
