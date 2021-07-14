@@ -14,11 +14,8 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
 import org.jetbrains.kotlin.fir.analysis.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.declarations.utils.isLocal
-import org.jetbrains.kotlin.fir.declarations.FirRegularClass
-import org.jetbrains.kotlin.fir.declarations.findArgumentByName
-import org.jetbrains.kotlin.fir.declarations.getAnnotationByFqName
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.utils.isLocal
 import org.jetbrains.kotlin.fir.expressions.FirConstExpression
 import org.jetbrains.kotlin.fir.expressions.FirQualifiedAccessExpression
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
@@ -28,19 +25,18 @@ import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
 import org.jetbrains.kotlin.fir.scopes.processDirectlyOverriddenFunctions
 import org.jetbrains.kotlin.fir.scopes.processDirectlyOverriddenProperties
-import org.jetbrains.kotlin.fir.types.*
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.ensureResolved
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
+import org.jetbrains.kotlin.fir.types.*
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.checkers.OptInNames
 import org.jetbrains.kotlin.utils.SmartSet
 import org.jetbrains.kotlin.utils.addIfNotNull
 
 object FirOptInUsageBaseChecker {
-    internal data class Experimentality(val annotationClassId: ClassId, val severity: Severity, val message: String?) {
+    data class Experimentality(val annotationClassId: ClassId, val severity: Severity, val message: String?) {
         enum class Severity { WARNING, ERROR }
         companion object {
             val DEFAULT_SEVERITY = Severity.ERROR
@@ -53,7 +49,7 @@ object FirOptInUsageBaseChecker {
         return fir.loadExperimentalityForMarkerAnnotation()
     }
 
-    private fun loadExperimentalitiesFromTypeArguments(
+    internal fun loadExperimentalitiesFromTypeArguments(
         context: CheckerContext,
         typeArguments: List<FirTypeProjection>
     ): Set<Experimentality> {
@@ -73,6 +69,7 @@ object FirOptInUsageBaseChecker {
         return result
     }
 
+    @OptIn(SymbolInternals::class)
     internal fun FirAnnotatedDeclaration.loadExperimentalities(
         context: CheckerContext,
         knownExperimentalities: SmartSet<Experimentality>? = null,
@@ -82,7 +79,7 @@ object FirOptInUsageBaseChecker {
         if (!visited.add(this)) return emptySet()
         val result = knownExperimentalities ?: SmartSet.create()
         val session = context.session
-        if (this is FirCallableMemberDeclaration) {
+        if (this is FirCallableDeclaration) {
             val parentClass = containingClass()?.toFirRegularClass(session)
             if (this.isSubstitutionOrIntersectionOverride) {
                 val parentClassScope = parentClass?.unsubstitutedScope(context)
@@ -113,7 +110,8 @@ object FirOptInUsageBaseChecker {
                 setter?.loadExperimentalities(context, result, visited)
             }
         } else if (this is FirRegularClass && !this.isLocal) {
-            outerClass(context)?.loadExperimentalities(context, result, visited)
+            val parentClassSymbol = symbol.outerClassSymbol(context)
+            parentClassSymbol?.fir?.loadExperimentalities(context, result, visited)
         }
 
         for (annotation in annotations) {
@@ -145,6 +143,7 @@ object FirOptInUsageBaseChecker {
         return result
     }
 
+    @OptIn(SymbolInternals::class)
     private fun ConeKotlinType?.addExperimentalities(
         context: CheckerContext,
         result: SmartSet<Experimentality>,
@@ -173,7 +172,7 @@ object FirOptInUsageBaseChecker {
         }
     }
 
-    internal fun FirRegularClass.loadExperimentalityForMarkerAnnotation(): Experimentality? {
+    private fun FirRegularClass.loadExperimentalityForMarkerAnnotation(): Experimentality? {
         val experimental = getAnnotationByClassId(OptInNames.REQUIRES_OPT_IN_CLASS_ID)
             ?: return null
 
@@ -211,9 +210,7 @@ object FirOptInUsageBaseChecker {
     ): Boolean {
         val languageVersionSettings = context.session.languageVersionSettings
         val fqNameAsString = annotationClassId.asFqNameString()
-        if (fqNameAsString in languageVersionSettings.getFlag(AnalysisFlags.experimental) ||
-            fqNameAsString in languageVersionSettings.getFlag(AnalysisFlags.useExperimental)
-        ) {
+        if (fqNameAsString in languageVersionSettings.getFlag(AnalysisFlags.useExperimental)) {
             return true
         }
         for (annotationContainer in context.annotationContainers) {

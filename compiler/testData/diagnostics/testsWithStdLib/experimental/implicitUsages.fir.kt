@@ -10,8 +10,8 @@ interface Some
 
 abstract class User {
     abstract fun createSome(): <!EXPERIMENTAL_API_USAGE_ERROR!>Some<!>
-    fun <!EXPERIMENTAL_API_USAGE_ERROR!>Some?<!>.onSome() {}
-    fun withSome(some: <!EXPERIMENTAL_API_USAGE_ERROR!>Some?<!> = null) {}
+    fun <!EXPERIMENTAL_API_USAGE_ERROR!>Some<!>?.onSome() {}
+    fun withSome(some: <!EXPERIMENTAL_API_USAGE_ERROR!>Some<!>? = null) {}
 
     fun use() {
         val something = <!EXPERIMENTAL_API_USAGE_ERROR!>createSome<!>()

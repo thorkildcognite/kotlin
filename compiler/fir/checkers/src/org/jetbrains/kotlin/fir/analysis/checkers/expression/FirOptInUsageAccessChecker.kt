@@ -13,8 +13,10 @@ import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.FirQualifiedAccess
 import org.jetbrains.kotlin.fir.expressions.FirVariableAssignment
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 
 object FirOptInUsageAccessChecker : FirQualifiedAccessChecker() {
+    @OptIn(SymbolInternals::class)
     override fun check(expression: FirQualifiedAccess, context: CheckerContext, reporter: DiagnosticReporter) {
         val sourceKind = expression.source?.kind
         if (sourceKind is FirFakeSourceElementKind.DataClassGeneratedMembers ||

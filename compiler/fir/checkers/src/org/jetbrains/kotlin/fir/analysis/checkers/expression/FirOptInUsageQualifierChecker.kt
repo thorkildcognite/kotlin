@@ -8,12 +8,15 @@ package org.jetbrains.kotlin.fir.analysis.checkers.expression
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
+import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 
 object FirOptInUsageQualifierChecker : FirResolvedQualifierChecker() {
+    @OptIn(SymbolInternals::class)
     override fun check(expression: FirResolvedQualifier, context: CheckerContext, reporter: DiagnosticReporter) {
-        val fir = expression.symbol?.fir ?: return
+        val symbol = expression.symbol as? FirRegularClassSymbol ?: return
         with(FirOptInUsageBaseChecker) {
-            val experimentalities = fir.loadExperimentalities(context)
+            val experimentalities = symbol.fir.loadExperimentalities(context)
             reportNotAcceptedExperimentalities(experimentalities, expression, context, reporter)
         }
     }
