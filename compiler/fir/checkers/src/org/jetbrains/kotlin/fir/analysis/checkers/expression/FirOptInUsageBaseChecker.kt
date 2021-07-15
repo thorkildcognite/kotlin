@@ -93,13 +93,6 @@ object FirOptInUsageBaseChecker {
 
         if (fir.origin == FirDeclarationOrigin.Library || fir.origin == FirDeclarationOrigin.Enhancement) {
             if (fir is FirCallableDeclaration) {
-                result.addAll(fir.returnTypeRef.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context.session))
-                result.addAll(fir.receiverTypeRef?.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context.session))
-                if (fir is FirSimpleFunction) {
-                    fir.valueParameters.forEach {
-                        result.addAll(it.returnTypeRef.coneTypeSafe<ConeKotlinType>().loadExperimentalities(context.session))
-                    }
-                }
                 val parentClass = fir.containingClass()?.toFirRegularClass(session)
                 if (parentClass != null) {
                     result.addAll(parentClass.experimentalities)
