@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.expressions.FirGetClassCall
 import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.fir.resolve.ImplicitReceiverStack
+import org.jetbrains.kotlin.fir.resolve.PersistentImplicitReceiverStack
 import org.jetbrains.kotlin.fir.resolve.SessionHolder
 import org.jetbrains.kotlin.fir.resolve.calls.ImplicitReceiverValue
 import org.jetbrains.kotlin.fir.resolve.transformers.ReturnTypeCalculator
@@ -25,7 +26,7 @@ abstract class CheckerContext {
     abstract val returnTypeCalculator: ReturnTypeCalculator
 
     // Context
-    abstract val implicitReceiverStack: ImplicitReceiverStack
+    abstract val implicitReceiverStack: PersistentImplicitReceiverStack
     abstract val containingDeclarations: List<FirDeclaration>
     abstract val qualifiedAccessOrAnnotationCalls: List<FirStatement>
     abstract val getClassCalls: List<FirGetClassCall>
