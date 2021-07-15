@@ -91,20 +91,6 @@ object FirOptInUsageBaseChecker {
             result.addAll(fir.setter?.calculateOwnExperimentalities(context.session, true).orEmpty())
         }
 
-        if (fir.origin == FirDeclarationOrigin.Library || fir.origin == FirDeclarationOrigin.Enhancement) {
-            if (fir is FirCallableDeclaration) {
-                val parentClass = fir.containingClass()?.toFirRegularClass(session)
-                if (parentClass != null) {
-                    result.addAll(parentClass.experimentalities)
-                }
-            } else if (fir is FirRegularClass) {
-                val parentClassSymbol = fir.symbol.outerClassSymbol(context)
-                if (parentClassSymbol is FirRegularClassSymbol) {
-                    result.addAll(parentClassSymbol.fir.experimentalities)
-                }
-            }
-        }
-
         return result
     }
 
