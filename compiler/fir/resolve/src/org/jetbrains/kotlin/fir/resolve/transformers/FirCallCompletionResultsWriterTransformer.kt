@@ -501,13 +501,7 @@ class FirCallCompletionResultsWriterTransformer(
 
         return declaration.typeParameters.map { ConeTypeParameterTypeImpl(it.symbol.toLookupTag(), false) }
             .map { candidate.substitutor.substituteOrSelf(it) }
-            .map {
-                finalSubstitutor.substituteOrSelf(it).let { substitutedType ->
-                    typeApproximator.approximateToSuperType(
-                        substitutedType, TypeApproximatorConfiguration.FinalApproximationAfterResolutionAndInference,
-                    ) ?: substitutedType
-                }
-            }
+            .map { finalSubstitutor.substituteOrSelf(it) }
     }
 
     override fun transformAnonymousFunctionExpression(
