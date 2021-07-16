@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.psi.stubs.elements.KtConstantExpressionElementType
 import org.jetbrains.kotlin.psi.stubs.elements.KtStringTemplateExpressionElementType
 import org.jetbrains.kotlin.psi.stubs.elements.KtValueArgumentElementType
 import org.jetbrains.kotlin.psi.stubs.elements.KtValueArgumentListElementType
+import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 object LightTreePositioningStrategies {
     val DEFAULT = object : LightTreePositioningStrategy() {
@@ -532,6 +533,10 @@ object LightTreePositioningStrategies {
                     tree.findChildByType(node, KtNodeTypes.NULLABLE_TYPE)
                         ?.let { tree.findChildByType(it, KtNodeTypes.USER_TYPE) }
                         ?: node
+                return markElement(nodeToMark, startOffset, endOffset, tree, node)
+            }
+            if (node.tokenType == KtNodeTypes.IMPORT_DIRECTIVE) {
+                val nodeToMark = tree.findChildByType(node, KtStubElementTypes.INSIDE_DIRECTIVE_EXPRESSIONS) ?: node
                 return markElement(nodeToMark, startOffset, endOffset, tree, node)
             }
             if (node.tokenType != KtNodeTypes.DOT_QUALIFIED_EXPRESSION &&

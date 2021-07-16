@@ -113,7 +113,8 @@ fun BodyResolveComponents.buildResolvedQualifierForClass(
     sourceElement: FirSourceElement? = null,
     // TODO: Clarify if we actually need type arguments for qualifier?
     typeArgumentsForQualifier: List<FirTypeProjection> = emptyList(),
-    diagnostic: ConeDiagnostic? = null
+    diagnostic: ConeDiagnostic? = null,
+    nonFatalDiagnostics: List<ConeDiagnostic> = emptyList()
 ): FirResolvedQualifier {
     val classId = regularClass.classId
 
@@ -129,6 +130,7 @@ fun BodyResolveComponents.buildResolvedQualifierForClass(
         relativeClassFqName = classId.relativeClassName
         typeArguments.addAll(typeArgumentsForQualifier)
         symbol = regularClass
+        this.nonFatalDiagnostics.addAll(nonFatalDiagnostics)
     }.build().apply {
         resultType = if (classId.isLocal) {
             typeForQualifierByDeclaration(regularClass.fir, resultType, session)
