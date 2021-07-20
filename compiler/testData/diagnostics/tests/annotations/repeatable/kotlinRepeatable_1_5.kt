@@ -1,3 +1,5 @@
+// !LANGUAGE: -RepeatableAnnotations
+
 @Repeatable
 annotation class repann
 
