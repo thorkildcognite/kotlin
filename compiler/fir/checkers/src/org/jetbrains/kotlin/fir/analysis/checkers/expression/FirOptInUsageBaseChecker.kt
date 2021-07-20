@@ -71,11 +71,6 @@ object FirOptInUsageBaseChecker {
         return result
     }
 
-    private object DeclarationExperimentalities : FirDeclarationDataKey()
-
-    private var FirAnnotatedDeclaration.experimentalities: Set<Experimentality>?
-            by FirDeclarationDataRegistry.data(DeclarationExperimentalities)
-
     @OptIn(SymbolInternals::class)
     internal fun FirAnnotatedDeclaration.loadExperimentalities(
         context: CheckerContext,
@@ -84,9 +79,6 @@ object FirOptInUsageBaseChecker {
         fromSetter: Boolean = false,
     ): Set<Experimentality> {
         if (!visited.add(this)) return emptySet()
-        if (!fromSetter) {
-            experimentalities?.let { return it }
-        }
         val result = knownExperimentalities ?: SmartSet.create()
         val session = context.session
         if (this is FirCallableDeclaration) {
