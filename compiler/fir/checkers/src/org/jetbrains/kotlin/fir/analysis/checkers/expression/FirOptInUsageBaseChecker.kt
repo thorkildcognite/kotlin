@@ -105,16 +105,6 @@ object FirOptInUsageBaseChecker {
                     }
                 }
             }
-            if (this !is FirConstructor) {
-                // Note: coneType here crashes on overridden members
-                returnTypeRef.coneTypeSafe<ConeKotlinType>().addExperimentalities(context, result, visited)
-                receiverTypeRef?.coneTypeSafe<ConeKotlinType>().addExperimentalities(context, result, visited)
-                if (this is FirSimpleFunction) {
-                    valueParameters.forEach {
-                        it.returnTypeRef.coneTypeSafe<ConeKotlinType>().addExperimentalities(context, result, visited)
-                    }
-                }
-            }
             parentClass?.loadExperimentalities(context, result, visited)
             if (fromSetter && this is FirProperty) {
                 setter?.loadExperimentalities(context, result, visited)
