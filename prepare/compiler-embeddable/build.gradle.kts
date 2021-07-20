@@ -93,6 +93,9 @@ val runtimeJar = runtimeJar(embeddableCompiler()) {
     mergeServiceFiles()
 
     transform(CoreXmlShadingTransformer::class.java)
+    outputs.upToDateWhen {
+        archiveFile.getOrNull()?.asFile.exists() ?: false
+    }
 }
 
 sourcesJar()
