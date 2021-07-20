@@ -94,7 +94,7 @@ val runtimeJar = runtimeJar(embeddableCompiler()) {
 
     transform(CoreXmlShadingTransformer::class.java)
     outputs.upToDateWhen {
-        archiveFile.getOrNull()?.asFile.exists() ?: false
+        archiveFile.getOrNull()?.asFile?.exists() ?: false
     }
 }
 
