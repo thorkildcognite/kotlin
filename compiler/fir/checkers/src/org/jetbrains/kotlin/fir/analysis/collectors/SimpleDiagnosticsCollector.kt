@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.fir.analysis.collectors
 
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.analysis.checkers.context.MutableCheckerContext
+import org.jetbrains.kotlin.fir.analysis.checkers.context.PersistentCheckerContext
 import org.jetbrains.kotlin.fir.analysis.collectors.components.AbstractDiagnosticCollectorComponent
 import org.jetbrains.kotlin.fir.analysis.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
@@ -19,7 +19,7 @@ class SimpleDiagnosticsCollector(
 ) : AbstractDiagnosticCollector(session, scopeSession, createComponents) {
     override fun createVisitor(components: List<AbstractDiagnosticCollectorComponent>): CheckerRunningDiagnosticCollectorVisitor {
         return CheckerRunningDiagnosticCollectorVisitor(
-            MutableCheckerContext(
+            PersistentCheckerContext(
                 this,
                 ReturnTypeCalculatorForFullBodyResolve()
             ),
