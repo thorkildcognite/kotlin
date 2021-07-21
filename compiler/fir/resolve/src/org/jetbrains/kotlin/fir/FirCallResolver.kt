@@ -256,10 +256,7 @@ class FirCallResolver(
                     nameReference.source,
                     qualifiedAccess.typeArguments,
                     diagnostic,
-                    nonFatalDiagnostics = extractDiagnostics(
-                        nameReference.source,
-                        qualifiedAccess.explicitReceiver
-                    )
+                    nonFatalDiagnostics = extractDiagnostics(qualifiedAccess)
                 )
             }
             referencedSymbol is FirTypeParameterSymbol && referencedSymbol.fir.isReified -> {
@@ -282,13 +279,15 @@ class FirCallResolver(
     }
 
     private fun extractDiagnostics(
-        source: FirSourceElement?,
-        explicitReceiver: FirExpression?
+        qualifiedAccess: FirQualifiedAccess?
     ): List<ConeDiagnostic> {
-        var result = (explicitReceiver as? FirResolvedQualifier)?.nonFatalDiagnostics ?: emptyList()
-        val text = source.text
-        if (text != null && text.isUnderscore && source != null) {
-            result = result + ConeUnderscoreUsageWithoutBackticks(source)
+        if (qualifiedAccess == null) {
+            return emptyList()
+        }
+
+        var result = (qualifiedAccess.explicitReceiver as? FirResolvedQualifier)?.nonFatalDiagnostics ?: emptyList()
+        if (qualifiedAccess.nonFatalDiagnostics.isNotEmpty()) {
+            result = result + qualifiedAccess.nonFatalDiagnostics.filter { !result.contains(it) }
         }
         return result
     }
