@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.fir.declarations.utils.isInner
 import org.jetbrains.kotlin.fir.declarations.utils.isReferredViaField
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.diagnostics.ConeStubDiagnostic
+import org.jetbrains.kotlin.fir.diagnostics.ConeUnderscoreUsageWithoutBackticks
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedReifiedParameterReference
 import org.jetbrains.kotlin.fir.references.*
@@ -254,7 +255,11 @@ class FirCallResolver(
                     referencedSymbol,
                     nameReference.source,
                     qualifiedAccess.typeArguments,
-                    diagnostic
+                    diagnostic,
+                    nonFatalDiagnostics = extractDiagnostics(
+                        nameReference.source,
+                        qualifiedAccess.explicitReceiver
+                    )
                 )
             }
             referencedSymbol is FirTypeParameterSymbol && referencedSymbol.fir.isReified -> {
@@ -274,6 +279,18 @@ class FirCallResolver(
         }
         if (resultExpression is FirExpression) transformer.storeTypeFromCallee(resultExpression)
         return resultExpression
+    }
+
+    private fun extractDiagnostics(
+        source: FirSourceElement?,
+        explicitReceiver: FirExpression?
+    ): List<ConeDiagnostic> {
+        var result = (explicitReceiver as? FirResolvedQualifier)?.nonFatalDiagnostics ?: emptyList()
+        val text = source.text
+        if (text != null && text.isUnderscore && source != null) {
+            result = result + ConeUnderscoreUsageWithoutBackticks(source)
+        }
+        return result
     }
 
     fun resolveCallableReference(
