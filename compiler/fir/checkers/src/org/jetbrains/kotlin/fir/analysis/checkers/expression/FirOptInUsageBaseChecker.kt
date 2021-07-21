@@ -242,10 +242,7 @@ object FirOptInUsageBaseChecker {
                 continue
             }
             val annotationClasses = annotation.findArgumentByName(OptInNames.USE_EXPERIMENTAL_ANNOTATION_CLASS) ?: continue
-            if (annotationClasses.extractClassesFromArgument().any {
-                    it.classId == annotationClassId
-                }
-            ) {
+            if (annotationClasses.extractClassesFromArgument().any { it.classId == annotationClassId }) {
                 return true
             }
         }
