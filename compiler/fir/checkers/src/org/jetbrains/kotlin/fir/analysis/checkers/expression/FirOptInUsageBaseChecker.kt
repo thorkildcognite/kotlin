@@ -51,7 +51,7 @@ object FirOptInUsageBaseChecker {
         return fir.loadExperimentalityForMarkerAnnotation()
     }
 
-    internal fun loadExperimentalitiesFromTypeArguments(
+    fun loadExperimentalitiesFromTypeArguments(
         context: CheckerContext,
         typeArguments: List<FirTypeProjection>
     ): Set<Experimentality> {
@@ -59,7 +59,7 @@ object FirOptInUsageBaseChecker {
         return loadExperimentalitiesFromConeArguments(context, typeArguments.map { it.toConeTypeProjection() })
     }
 
-    internal fun loadExperimentalitiesFromConeArguments(
+    fun loadExperimentalitiesFromConeArguments(
         context: CheckerContext,
         typeArguments: List<ConeTypeProjection>
     ): Set<Experimentality> {
@@ -71,12 +71,18 @@ object FirOptInUsageBaseChecker {
         return result
     }
 
+    fun FirAnnotatedDeclaration.loadExperimentalities(
+        context: CheckerContext, fromSetter: Boolean
+    ): Set<Experimentality> = loadExperimentalities(
+        context, knownExperimentalities = null, visited = mutableSetOf(), fromSetter
+    )
+
     @OptIn(SymbolInternals::class)
-    internal fun FirAnnotatedDeclaration.loadExperimentalities(
+    private fun FirAnnotatedDeclaration.loadExperimentalities(
         context: CheckerContext,
-        knownExperimentalities: SmartSet<Experimentality>? = null,
-        visited: MutableSet<FirAnnotatedDeclaration> = mutableSetOf(),
-        fromSetter: Boolean = false,
+        knownExperimentalities: SmartSet<Experimentality>?,
+        visited: MutableSet<FirAnnotatedDeclaration>,
+        fromSetter: Boolean,
     ): Set<Experimentality> {
         if (!visited.add(this)) return emptySet()
         val result = knownExperimentalities ?: SmartSet.create()
@@ -87,7 +93,7 @@ object FirOptInUsageBaseChecker {
                 val parentClassScope = parentClass?.unsubstitutedScope(context)
                 if (this is FirSimpleFunction) {
                     parentClassScope?.processDirectlyOverriddenFunctions(symbol) {
-                        it.fir.loadExperimentalities(context, result, visited)
+                        it.fir.loadExperimentalities(context, result, visited, fromSetter = false)
                         ProcessorAction.NEXT
                     }
                 } else if (this is FirProperty) {
@@ -107,13 +113,13 @@ object FirOptInUsageBaseChecker {
                     }
                 }
             }
-            parentClass?.loadExperimentalities(context, result, visited)
+            parentClass?.loadExperimentalities(context, result, visited, fromSetter = false)
             if (fromSetter && this is FirProperty) {
-                setter?.loadExperimentalities(context, result, visited)
+                setter?.loadExperimentalities(context, result, visited, fromSetter = false)
             }
         } else if (this is FirRegularClass && !this.isLocal) {
             val parentClassSymbol = symbol.outerClassSymbol(context)
-            parentClassSymbol?.fir?.loadExperimentalities(context, result, visited)
+            parentClassSymbol?.fir?.loadExperimentalities(context, result, visited, fromSetter = false)
         }
 
         for (annotation in annotations) {
@@ -128,8 +134,7 @@ object FirOptInUsageBaseChecker {
         }
 
         if (this is FirTypeAlias) {
-            // coneTypeSafe: see FirIdeSpecTest compiler/tests-spec/testData/diagnostics/notLinked/dfa/neg/6.kt
-            expandedTypeRef.coneTypeSafe<ConeKotlinType>().addExperimentalities(context, result, visited)
+            expandedTypeRef.coneType.addExperimentalities(context, result, visited)
         }
 
         if (getAnnotationByClassId(OptInNames.WAS_EXPERIMENTAL_CLASS_ID) != null) {
@@ -158,7 +163,7 @@ object FirOptInUsageBaseChecker {
                 val expandedType = fullyExpandedType(context.session)
                 if (this === expandedType) {
                     expandedType.lookupTag.toFirRegularClass(context.session)?.loadExperimentalities(
-                        context, result, visited
+                        context, result, visited, fromSetter = false
                     )
                     typeArguments.forEach {
                         if (!it.isStarProjection) it.type?.addExperimentalities(context, result, visited)
@@ -167,7 +172,7 @@ object FirOptInUsageBaseChecker {
                     val symbol = lookupTag.toSymbol(context.session)
                     if (symbol != null) {
                         symbol.ensureResolved(FirResolvePhase.STATUS)
-                        symbol.fir.loadExperimentalities(context, result, visited)
+                        symbol.fir.loadExperimentalities(context, result, visited, fromSetter = false)
                     }
                     expandedType.typeArguments.forEach {
                         if (!it.isStarProjection) it.type?.addExperimentalities(context, result, visited)
@@ -177,7 +182,7 @@ object FirOptInUsageBaseChecker {
         }
     }
 
-    internal fun FirRegularClass.loadExperimentalityForMarkerAnnotation(): Experimentality? {
+    private fun FirRegularClass.loadExperimentalityForMarkerAnnotation(): Experimentality? {
         val experimental = getAnnotationByClassId(OptInNames.REQUIRES_OPT_IN_CLASS_ID)
             ?: return null
 
@@ -188,7 +193,7 @@ object FirOptInUsageBaseChecker {
         return Experimentality(symbol.classId, level.severity, message)
     }
 
-    internal fun reportNotAcceptedExperimentalities(
+    fun reportNotAcceptedExperimentalities(
         experimentalities: Collection<Experimentality>,
         element: FirElement,
         context: CheckerContext,

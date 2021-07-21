@@ -35,7 +35,7 @@ object FirOptInUsageAccessChecker : FirQualifiedAccessChecker() {
                 reportNotAcceptedExperimentalities(experimentalities, expression.lValue, context, reporter)
                 return
             }
-            val experimentalities = fir.loadExperimentalities(context) +
+            val experimentalities = fir.loadExperimentalities(context, fromSetter = false) +
                     loadExperimentalitiesFromTypeArguments(context, expression.typeArguments)
             reportNotAcceptedExperimentalities(experimentalities, expression, context, reporter)
         }

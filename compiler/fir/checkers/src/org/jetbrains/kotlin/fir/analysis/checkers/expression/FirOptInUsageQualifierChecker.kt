@@ -19,7 +19,7 @@ object FirOptInUsageQualifierChecker : FirResolvedQualifierChecker() {
         symbol.ensureResolved(FirResolvePhase.STATUS)
         val fir = symbol.fir
         with(FirOptInUsageBaseChecker) {
-            val experimentalities = fir.loadExperimentalities(context)
+            val experimentalities = fir.loadExperimentalities(context, fromSetter = false)
             reportNotAcceptedExperimentalities(experimentalities, expression, context, reporter)
         }
     }
